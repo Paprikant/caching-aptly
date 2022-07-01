@@ -1,8 +1,11 @@
 package s3
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -302,6 +305,11 @@ func (storage *PublishedStorage) LinkFromPool(publishedDirectory, fileName strin
 	relPath := filepath.Join(publishedDirectory, fileName)
 	poolPath := filepath.Join(storage.prefix, relPath)
 
+	// try to load path cache if possible
+	if storage.pathCache == nil {
+		storage.loadPathCache()
+	}
+
 	if storage.pathCache == nil {
 		paths, md5s, err := storage.internalFilelist("", true)
 		if err != nil {
@@ -343,7 +351,7 @@ func (storage *PublishedStorage) LinkFromPool(publishedDirectory, fileName strin
 
 		}
 	}
-
+	fmt.Printf("uploading package %s ...\n", sourcePath)
 	source, err := sourcePool.Open(sourcePath)
 	if err != nil {
 		return err
@@ -366,7 +374,7 @@ func (storage *PublishedStorage) Filelist(prefix string) ([]string, error) {
 	return paths, err
 }
 
-func (storage *PublishedStorage) internalFilelist(prefix string, hidePlusWorkaround bool) (paths []string, md5s []string, err error) {
+func (storage *PublishedStorage) internalFilelist(prefix string, hidePlusWorkaround bool) (paths []string, md5s []string, err error) {	
 	paths = make([]string, 0, 1024)
 	md5s = make([]string, 0, 1024)
 	prefix = filepath.Join(storage.prefix, prefix)
@@ -498,4 +506,37 @@ func (storage *PublishedStorage) ReadLink(path string) (string, error) {
 	}
 
 	return aws.StringValue(output.Metadata["SymLink"]), nil
+}
+
+func (storage *PublishedStorage) PersistPathCache() {
+	pathCacheJSON, _ := json.Marshal(storage.pathCache)
+	if err := os.WriteFile("/tmp/pathCache", pathCacheJSON, 0644); err != nil {
+		log.Panic(err.Error())
+	}
+}
+
+func (storage *PublishedStorage) loadPathCache() {
+	file, err := os.Open("/tmp/pathCache")
+
+	if err != nil  {
+		if errors.Is(err, os.ErrNotExist) {
+			return
+		}
+		log.Panic(err.Error())
+	}
+
+	defer file.Close()
+
+	bytes, _ := ioutil.ReadAll(file)
+
+	err = json.Unmarshal(bytes, &storage.pathCache)
+
+	if err != nil {
+		log.Panic(err.Error())
+	}
+}
+
+func (storage *PublishedStorage) DeleteFromPathCache(path string) {
+	fmt.Printf("deleting file %s\n", path)
+	delete(storage.pathCache, path)
 }

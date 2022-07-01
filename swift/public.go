@@ -310,3 +310,11 @@ func (storage *PublishedStorage) ReadLink(path string) (string, error) {
 
 	return headers["SymLink"], nil
 }
+
+func (storage *PublishedStorage) PersistPathCache() {
+
+}
+
+func (storage *PublishedStorage) DeleteFromPathCache(path string) {
+
+}

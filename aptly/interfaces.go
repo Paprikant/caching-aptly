@@ -83,6 +83,9 @@ type PublishedStorage interface {
 	FileExists(path string) (bool, error)
 	// ReadLink returns the symbolic link pointed to by path
 	ReadLink(path string) (string, error)
+
+	PersistPathCache()
+	DeleteFromPathCache(path string)
 }
 
 // FileSystemPublishedStorage is published storage on filesystem

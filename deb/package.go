@@ -620,14 +620,12 @@ func (p *Package) LinkFromPool(publishedStorage aptly.PublishedStorage, packageP
 		if err != nil {
 			return err
 		}
-
 		publishedDirectory := filepath.Join(prefix, relPath)
 
 		err = publishedStorage.LinkFromPool(publishedDirectory, f.Filename, packagePool, sourcePoolPath, f.Checksums, force)
 		if err != nil {
 			return err
 		}
-
 		if p.IsSource {
 			p.Extra()["Directory"] = relPath
 		} else {

@@ -691,6 +691,11 @@ func (p *PublishedRepo) Publish(packagePool aptly.PackagePool, publishedStorageP
 			return batch.Write()
 		})
 
+		// during LinkFromPool an initial pathCache is created (or recovered from last execution)
+		// new packages are added to that cache as they are discovered
+		// a pathCache with the new paths should therefore be persisted
+		publishedStorage.PersistPathCache()
+
 		if err != nil {
 			return fmt.Errorf("unable to process packages: %s", err)
 		}
@@ -1181,8 +1186,14 @@ func (collection *PublishedRepoCollection) CleanupPrefixComponentFiles(prefix st
 			if err != nil {
 				return err
 			}
+
+			// remove the given file from path cache
+			publishedStorage.DeleteFromPathCache(filepath.Join(rootPath, file))
 		}
 	}
+
+	// persist changes to pathCache
+	publishedStorage.PersistPathCache()
 
 	return nil
 }
