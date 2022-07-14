@@ -374,7 +374,7 @@ func (storage *PublishedStorage) Filelist(prefix string) ([]string, error) {
 	return paths, err
 }
 
-func (storage *PublishedStorage) internalFilelist(prefix string, hidePlusWorkaround bool) (paths []string, md5s []string, err error) {	
+func (storage *PublishedStorage) internalFilelist(prefix string, hidePlusWorkaround bool) (paths []string, md5s []string, err error) {
 	paths = make([]string, 0, 1024)
 	md5s = make([]string, 0, 1024)
 	prefix = filepath.Join(storage.prefix, prefix)
@@ -537,6 +537,12 @@ func (storage *PublishedStorage) loadPathCache() {
 }
 
 func (storage *PublishedStorage) DeleteFromPathCache(path string) {
-	fmt.Printf("deleting file %s\n", path)
+	log.Printf("deleting file %s\n", path)
 	delete(storage.pathCache, path)
+}
+
+func (storage *PublishedStorage) DeletePathCache() {
+	if err := os.Remove("/tmp/pathCache"); err != nil {
+		log.Printf("Failed to delete pathCache")
+	}
 }

@@ -86,6 +86,7 @@ type PublishedStorage interface {
 
 	PersistPathCache()
 	DeleteFromPathCache(path string)
+	DeletePathCache()
 }
 
 // FileSystemPublishedStorage is published storage on filesystem

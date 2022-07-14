@@ -857,6 +857,9 @@ func (p *PublishedRepo) RemoveFiles(publishedStorageProvider aptly.PublishedStor
 	removePoolComponents []string, progress aptly.Progress) error {
 	publishedStorage := publishedStorageProvider.GetPublishedStorage(p.Storage)
 
+	// delete pathCache when removing whole directories
+	publishedStorage.DeletePathCache()
+
 	// I. Easy: remove whole prefix (meta+packages)
 	if removePrefix {
 		err := publishedStorage.RemoveDirs(filepath.Join(p.Prefix, "dists"), progress)

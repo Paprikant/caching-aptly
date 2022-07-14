@@ -284,10 +284,9 @@ func (storage *PublishedStorage) ReadLink(path string) (string, error) {
 	return filepath.Rel(storage.rootPath, absPath)
 }
 
-func (storage *PublishedStorage) PersistPathCache() {
 
-}
+func (storage *PublishedStorage) PersistPathCache() {}
 
-func (storage *PublishedStorage) DeleteFromPathCache(path string) {
+func (storage *PublishedStorage) DeleteFromPathCache(path string) {}
 
-}
+func (storage *PublishedStorage) DeletePathCache() {}

@@ -374,10 +374,8 @@ func (storage *PublishedStorage) ReadLink(path string) (string, error) {
 	return resp.NewMetadata()["SymLink"], nil
 }
 
-func (storage *PublishedStorage) PersistPathCache() {
+func (storage *PublishedStorage) PersistPathCache() {}
 
-}
+func (storage *PublishedStorage) DeleteFromPathCache(path string) {}
 
-func (storage *PublishedStorage) DeleteFromPathCache(path string) {
-
-}
+func (storage *PublishedStorage) DeletePathCache() {}
